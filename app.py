@@ -252,15 +252,23 @@ def display_risk_analysis(df):
         return
 
     # Summary Table 
+    # risk_analysis = df.groupby('Risk_Level').agg(
+    #     Count=('Full_Name', 'count'),
+    #     Early_Term_Rate=('Early_Termination', 'mean'),
+    #     Avg_Tenure=('Tenure_Days', 'mean'),
+    #     Avg_Score=('Score', 'mean')
+    # ).round(2).reindex(['Low Risk', 'Medium Risk', 'High Risk']) 
     
+    # st.dataframe(risk_analysis, use_container_width=True)
     
+    # high_risk_rate = risk_analysis.loc['High Risk', 'Early_Term_Rate']
+    # low_risk_rate = risk_analysis.loc['Low Risk', 'Early_Term_Rate']
     
-    high_risk_rate = risk_analysis.loc['High Risk', 'Early_Term_Rate']
-    low_risk_rate = risk_analysis.loc['Low Risk', 'Early_Term_Rate']
+    # st.markdown("##### Predictive Power of Risk Model")
+    # col1, col2, col3 = st.columns(3)
+    # col1.metric(label="High-Risk Early Term Rate", value=f"{high_risk_rate:.1%}")
+    # col2.metric(label="Low-Risk Early Term Rate", value=f"{low_risk_rate:.1%}")
     
-    col1, col2, col3 = st.columns(3)
-    col1.metric(label="High-Risk Early Term Rate", value=f"{high_risk_rate:.1%}")
-    col2.metric(label="Low-Risk Early Term Rate", value=f"{low_risk_rate:.1%}")
     if low_risk_rate > 0:
         col3.metric(label="Risk Ratio", value=f"{high_risk_rate/low_risk_rate:.1f}x",
                     help="High-risk employees are this many times more likely to terminate early than low-risk employees.")
@@ -381,5 +389,6 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
