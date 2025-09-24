@@ -269,11 +269,11 @@ def display_risk_analysis(df):
     # col1.metric(label="High-Risk Early Term Rate", value=f"{high_risk_rate:.1%}")
     # col2.metric(label="Low-Risk Early Term Rate", value=f"{low_risk_rate:.1%}")
     
-    if low_risk_rate > 0:
-        col3.metric(label="Risk Ratio", value=f"{high_risk_rate/low_risk_rate:.1f}x",
-                    help="High-risk employees are this many times more likely to terminate early than low-risk employees.")
-    else:
-        col3.metric(label="Risk Ratio", value="N/A")
+    # if low_risk_rate > 0:
+    #     col3.metric(label="Risk Ratio", value=f"{high_risk_rate/low_risk_rate:.1f}x",
+    #                 help="High-risk employees are this many times more likely to terminate early than low-risk employees.")
+    # else:
+    #     col3.metric(label="Risk Ratio", value="N/A")
 
     col_a, col_b = st.columns(2)
     col_c, col_d = st.columns(2)
@@ -389,6 +389,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
