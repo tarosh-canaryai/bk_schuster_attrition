@@ -264,7 +264,6 @@ def display_risk_analysis(df):
     high_risk_rate = risk_analysis.loc['High Risk', 'Early_Term_Rate']
     low_risk_rate = risk_analysis.loc['Low Risk', 'Early_Term_Rate']
     
-    st.markdown("##### Predictive Power of Risk Model")
     col1, col2, col3 = st.columns(3)
     col1.metric(label="High-Risk Early Term Rate", value=f"{high_risk_rate:.1%}")
     col2.metric(label="Low-Risk Early Term Rate", value=f"{low_risk_rate:.1%}")
@@ -386,4 +385,5 @@ if static_df is not None:
     display_risk_analysis(static_df)
 
 else:
+
     st.warning("Could not generate static analysis because the source data files are missing.")
