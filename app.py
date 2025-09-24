@@ -315,7 +315,43 @@ def display_risk_analysis(df):
         st.plotly_chart(fig4, use_container_width=True)
 
 
+def display_model_comparison_chart():
+    """
+    Displays a bar chart comparing the accuracy
+    of the different models that were trained.
+    """
+    st.subheader("Model Performance Comparison")
+    st.markdown("""
+    During development, several machine learning models were trained and evaluated. 
+    The chart below shows the accuracy of each model on a held-out test dataset. The **Random Forest**
+    model was selected for deployment as it provided a strong balance of predictive accuracy and stability.
+    """)
 
+    model_data = {
+        'Model': ['Gradient Boosting', 'Random Forest', 'Support Vector Machine', 'Logistic Regression'],
+        'Accuracy': [0.730, 0.738, 0.303, 0.216]
+    }
+    
+    accuracies_df = pd.DataFrame(model_data).sort_values('Accuracy', ascending=False)
+
+    fig = px.bar(
+        accuracies_df,
+        x='Model',
+        y='Accuracy',
+        color='Model',  
+        title='Model Accuracy on Test Data',
+        labels={'Accuracy': 'Accuracy Score'},
+        text='Accuracy'  
+    )
+
+    fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+    fig.update_layout(
+        yaxis_range=[0, 1.0],  
+        uniformtext_minsize=8, 
+        uniformtext_mode='hide'
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -381,6 +417,7 @@ st.info("The following interactive charts are based on the original historical d
 static_df = load_and_process_static_data()
 
 if static_df is not None:
+    display_model_comparison_chart()
     display_static_dashboard(static_df)
     display_correlation_charts(static_df)
     display_geographic_analysis(static_df)  
@@ -389,6 +426,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
