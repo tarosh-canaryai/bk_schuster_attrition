@@ -254,7 +254,6 @@ def display_risk_analysis(df):
     # Summary Table 
     
     
-    st.dataframe(risk_analysis, use_container_width=True)
     
     high_risk_rate = risk_analysis.loc['High Risk', 'Early_Term_Rate']
     low_risk_rate = risk_analysis.loc['Low Risk', 'Early_Term_Rate']
@@ -382,4 +381,5 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
