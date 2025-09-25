@@ -425,9 +425,7 @@ if uploaded_file is not None:
                         def highlight_mismatch(row):
                             style = [''] * len(row)
                             if pd.notna(row['Tenure_Quarter']):
-                                if row['Predicted Tenure'] == row['Tenure_Quarter']:
-                                    style = ['background-color: #d4edda'] * len(row) 
-                                else:
+                                if row['Predicted Tenure'] != row['Tenure_Quarter']:
                                     style = ['background-color: #f8d7da'] * len(row) 
                             return style
 
@@ -461,6 +459,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
