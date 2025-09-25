@@ -41,7 +41,7 @@ def load_and_process_static_data():
     term_data['Hired'] = pd.to_datetime(term_data['Hired'], errors='coerce')
     term_data['Terminated'] = pd.to_datetime(term_data['Terminated'], errors='coerce')
     term_data['Full_Name'] = term_data['First Name'].str.upper() + ' ' + term_data['Last Name'].str.upper()
-    term_data['Tenure_Days'] = (term_data['Terminated'] - term_data['Hired']).dt.days
+    term_data['Tenure_Days'] = ((term_data['Terminated'] - term_data['Hired']).dt.days).abs()
     work_ethic_data['Full_Name'] = work_ethic_data['First Name'].str.upper() + ' ' + work_ethic_data['Last Name'].str.upper()
     
     merged_data = pd.merge(term_data, work_ethic_data, on='Full_Name', how='inner')
@@ -496,6 +496,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
