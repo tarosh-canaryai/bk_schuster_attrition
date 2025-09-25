@@ -18,7 +18,7 @@ REQUIRED_COLUMNS_FOR_MODEL = [
     'Integrity', 'Work Ethic/Duty', 'Withholding', 'Manipulative', 'Anchor Cherry Picking'
 ]
 
-COLUMNS_TO_REMOVE_FROM_DISPLAY = ['First Name_term', 'Last Name_term', 'Full_Name', 'First Name_ethic', 'Last Name_etic', 'Email', 'Phone']
+COLUMNS_TO_REMOVE_FROM_DISPLAY = ['First Name_term', 'Last Name_term', 'Full_Name', 'First Name_ethic', 'Last Name_ethic', 'Email', 'Phone']
 
 # STATIC ANALYSIS
 
@@ -430,6 +430,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
