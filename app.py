@@ -408,9 +408,7 @@ if uploaded_file is not None:
                     st.subheader("Prediction Results")
 
                     if 'Tenure_Quarter' in results_df.columns:
-                        
-                        st.info("Ground truth column 'Tenure_Quarter' found. Calculating model accuracy.")
-                        
+                                                
                         comparison_df = results_df.dropna(subset=['Tenure_Quarter'])
                         
                         total_predictions = len(comparison_df)
@@ -459,6 +457,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
