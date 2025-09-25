@@ -208,7 +208,10 @@ def display_geographic_analysis(df):
         return
         
     if 'Tenure_Days' in df.columns and 'Early_Termination' not in df.columns:
+        df['Tenure_Days'] = df['Tenure_Days'].abs()
         df['Early_Termination'] = df['Tenure_Days'] <= 30
+        
+
 
     city_analysis = df.groupby('City').agg(
         Employee_Count=('Full_Name', 'count'),
@@ -232,7 +235,6 @@ def display_geographic_analysis(df):
 
     # Average Tenure by City
     with col2:
-        merged_data['Tenure_Days'] = merged_data['Tenure_Days'].abs()
         fig2 = px.bar(top_cities, y=top_cities.index, x='Avg_Tenure', orientation='h',
                       title='Average Tenure by Top Cities', color_discrete_sequence=px.colors.qualitative.Pastel)
         fig2.update_layout(yaxis_title='City', xaxis_title='Average Tenure (Days)', yaxis={'categoryorder':'total ascending'})
@@ -487,6 +489,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
