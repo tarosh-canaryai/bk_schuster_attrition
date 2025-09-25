@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import json
+import numpy as np
 import plotly.express as px
 import warnings
 
@@ -36,6 +37,7 @@ def load_and_process_static_data():
                  "Please make sure they are in the same directory as this script.")
         return None
 
+    # Clean and merge data
     term_data['Hired'] = pd.to_datetime(term_data['Hired'], errors='coerce')
     term_data['Terminated'] = pd.to_datetime(term_data['Terminated'], errors='coerce')
     term_data['Full_Name'] = term_data['First Name'].str.upper() + ' ' + term_data['Last Name'].str.upper()
@@ -44,6 +46,14 @@ def load_and_process_static_data():
     
     merged_data = pd.merge(term_data, work_ethic_data, on='Full_Name', how='inner')
     
+    # Convert score columns to numeric
+    numeric_cols = ['Score', 'Conscientious', 'Achievement', 'Organized', 'Integrity', 
+                    'Work Ethic/Duty', 'Withholding', 'Manipulative', 'Anchor Cherry Picking']
+    for col in numeric_cols:
+        if col in merged_data.columns:
+            merged_data[col] = pd.to_numeric(merged_data[col], errors='coerce')
+            
+    # --- Full Feature Engineering (from notebook) ---
     def categorize_tenure(days):
         if pd.isna(days): return 'Active Employee'
         if days <= 30: return 'Short (<=30 days)'
@@ -53,6 +63,9 @@ def load_and_process_static_data():
     merged_data['Tenure_Category'] = merged_data['Tenure_Days'].apply(categorize_tenure)
     merged_data['Early_Termination'] = merged_data['Tenure_Days'] <= 30
     merged_data['Hire_Month_Num'] = merged_data['Hired'].dt.month
+
+    # --- NEW: Create a Status column for plotting ---
+    merged_data['Status'] = np.where(merged_data['Tenure_Days'].isna(), 'Active', 'Terminated')
 
     ethic_cols = ['Conscientious', 'Achievement', 'Organized', 'Integrity', 'Work Ethic/Duty']
     risk_cols = ['Withholding', 'Manipulative', 'Anchor Cherry Picking']
@@ -101,13 +114,21 @@ def display_static_dashboard(df):
                        annotation_text=f"Mean: {df['Score'].mean():.1f}")
         st.plotly_chart(fig2, use_container_width=True)
 
+        # Chart 3: Hiring by month (Stacked Bar Chart by Status)
     with col3:
-        hire_month_counts = df['Hire_Month_Num'].value_counts().sort_index().reset_index()
+        hire_month_status = df.groupby(['Hire_Month_Num', 'Status']).size().reset_index(name='count')
         month_map = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 
                      7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
-        hire_month_counts['Hire_Month_Name'] = hire_month_counts['Hire_Month_Num'].map(month_map)
-        fig3 = px.bar(hire_month_counts, x='Hire_Month_Name', y='count', 
-                      title='Hiring by Month', labels={'count': 'Number of Hires'})
+        hire_month_status['Hire_Month_Name'] = hire_month_status['Hire_Month_Num'].map(month_map)
+        
+        fig3 = px.bar(hire_month_status, 
+                      x='Hire_Month_Name', 
+                      y='count', 
+                      color='Status',
+                      title='Hiring by Month (Active vs. Terminated)', 
+                      labels={'count': 'Number of Hires'},
+                      category_orders={"Hire_Month_Name": list(month_map.values())},
+                      color_discrete_map={'Active': '#1f77b4', 'Terminated': '#ff7f0e'}) # Blue, Orange
         st.plotly_chart(fig3, use_container_width=True)
 
     with col4:
@@ -249,6 +270,23 @@ def display_risk_analysis(df):
     """
     st.subheader("High-Risk Employee Profile Analysis")
 
+    st.markdown("""
+    This analysis categorizes employees into risk levels based on a points system derived from their work ethic assessment. 
+    These definitions provide context for the charts below.
+
+    **Key Definitions:**
+    *   **Early Termination:** An employee is considered an "early termination" if they leave **within 30 days** of their hire date.
+    *   **Risk Score Calculation:** Points are assigned based on the following factors:
+        - **Work Ethic Score:** < 50 (**+3 pts**), 50-69 (**+1 pt**)
+        - **Negative Traits Score:** > 50 (**+2 pts**)
+        - **GYR Status:** RED (**+2 pts**), YELLOW (**+1 pt**)
+        - **Composite Work Ethic Score:** < 50 (**+2 pts**)
+    *   **Risk Levels:**
+        - **High Risk:** Total score of **5 or more** points.
+        - **Medium Risk:** Total score of **3 or 4** points.
+        - **Low Risk:** Total score of **0, 1, or 2** points.
+    """)
+
     if 'Risk_Level' not in df.columns or 'Tenure_Days' not in df.columns:
         st.warning("Cannot generate risk analysis because required columns could not be calculated.")
         return
@@ -358,6 +396,7 @@ def display_model_comparison_chart():
 
 
 
+
 # SECTION 2: STREAMLIT UI LAYOUT
 
 st.title("🚀 Employee Tenure Analysis & Prediction Platform")
@@ -457,6 +496,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
