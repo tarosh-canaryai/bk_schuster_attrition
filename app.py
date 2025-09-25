@@ -426,7 +426,7 @@ if uploaded_file is not None:
                             style = [''] * len(row)
                             if pd.notna(row['Tenure_Quarter']):
                                 if row['Predicted Tenure'] != row['Tenure_Quarter']:
-                                    style = ['background-color: #f8d7da'] * len(row) 
+                                    style = ['background-color: rgba(242, 85, 85, 0.4)'] * len(row) 
                             return style
 
                         final_display_df = results_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
@@ -459,6 +459,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
