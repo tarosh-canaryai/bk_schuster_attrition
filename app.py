@@ -404,9 +404,40 @@ if uploaded_file is not None:
                     results_df = input_df.copy()
                     results_df['Predicted Tenure'] = [p['prediction'] for p in predictions]
                     results_df['Confidence'] = [f"{max(p['probabilities'].values()):.2%}" for p in predictions]
+                    
                     st.subheader("Prediction Results")
-                    final_display_df = results_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
-                    st.dataframe(final_display_df)
+
+                    if 'Tenure_Quarter' in results_df.columns:
+                        
+                        st.info("Ground truth column 'Tenure_Quarter' found. Calculating model accuracy.")
+                        
+                        comparison_df = results_df.dropna(subset=['Tenure_Quarter'])
+                        
+                        total_predictions = len(comparison_df)
+                        correct_predictions = (comparison_df['Predicted Tenure'] == comparison_df['Tenure_Quarter']).sum()
+                        accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+                        
+                        col1, col2, col3 = st.columns(3)
+                        col1.metric("Total Predictions Evaluated", total_predictions)
+                        col2.metric("Correct Predictions", correct_predictions)
+                        col3.metric("Model Accuracy", f"{accuracy:.1%}")
+
+                        def highlight_mismatch(row):
+                            style = [''] * len(row)
+                            if pd.notna(row['Tenure_Quarter']):
+                                if row['Predicted Tenure'] == row['Tenure_Quarter']:
+                                    style = ['background-color: #d4edda'] * len(row) 
+                                else:
+                                    style = ['background-color: #f8d7da'] * len(row) 
+                            return style
+
+                        final_display_df = results_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
+                        st.dataframe(final_display_df.style.apply(highlight_mismatch, axis=1))
+
+                    else:
+                        st.info("To see model accuracy and visual indicators, include a column named 'Tenure_Quarter' in your CSV.")
+                        final_display_df = results_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
+                        st.dataframe(final_display_df)
 
                 except requests.exceptions.RequestException as e:
                     st.error(f"API Request Failed: {e}")
@@ -430,6 +461,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
