@@ -18,6 +18,8 @@ REQUIRED_COLUMNS_FOR_MODEL = [
     'Integrity', 'Work Ethic/Duty', 'Withholding', 'Manipulative', 'Anchor Cherry Picking'
 ]
 
+COLUMNS_TO_REMOVE_FROM_DISPLAY = ['First Name_term', 'Last Name_term', 'Full_Name', 'First Name_ethic', 'Last Name_etic', 'Email', 'Phone']
+
 # STATIC ANALYSIS
 
 @st.cache_data
@@ -384,8 +386,9 @@ if uploaded_file is not None:
         st.error(f"Your CSV is missing columns required by the model: **{', '.join(missing_cols)}**")
 
     else:
-        st.success("CSV validated successfully. Ready for prediction.")
-        st.dataframe(input_df.head())
+        st.success("✅ CSV validated successfully. Ready for prediction.")
+        preview_df = input_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
+        st.dataframe(preview_df.head())
 
         if st.button("Predict Tenure for Uploaded Data", type="primary", disabled=(not azure_url or not api_key)):
 
@@ -402,7 +405,8 @@ if uploaded_file is not None:
                     results_df['Predicted Tenure'] = [p['prediction'] for p in predictions]
                     results_df['Confidence'] = [f"{max(p['probabilities'].values()):.2%}" for p in predictions]
                     st.subheader("Prediction Results")
-                    st.dataframe(results_df)
+                    final_display_df = results_df.drop(columns=COLUMNS_TO_REMOVE_FROM_DISPLAY, errors='ignore')
+                    st.dataframe(final_display_df)
 
                 except requests.exceptions.RequestException as e:
                     st.error(f"API Request Failed: {e}")
@@ -426,6 +430,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
