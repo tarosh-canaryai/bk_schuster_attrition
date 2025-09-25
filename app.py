@@ -221,6 +221,7 @@ def display_geographic_analysis(df):
 
     city_analysis = city_analysis.sort_values('Employee_Count', ascending=False)
     top_cities = city_analysis.head(8)
+    top_cities['Avg_Tenure'] = top_cities['Avg_Tenure'].abs()
 
     col1, col2 = st.columns(2)
     col3, col4 = st.columns(2)
@@ -488,6 +489,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
