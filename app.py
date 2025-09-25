@@ -41,7 +41,7 @@ def load_and_process_static_data():
     term_data['Hired'] = pd.to_datetime(term_data['Hired'], errors='coerce')
     term_data['Terminated'] = pd.to_datetime(term_data['Terminated'], errors='coerce')
     term_data['Full_Name'] = term_data['First Name'].str.upper() + ' ' + term_data['Last Name'].str.upper()
-    term_data['Tenure_Days'] = ((term_data['Terminated'] - term_data['Hired']).dt.days).abs()
+    term_data['Tenure_Days'] = (term_data['Terminated'] - term_data['Hired']).dt.days
     work_ethic_data['Full_Name'] = work_ethic_data['First Name'].str.upper() + ' ' + work_ethic_data['Last Name'].str.upper()
     
     merged_data = pd.merge(term_data, work_ethic_data, on='Full_Name', how='inner')
@@ -145,16 +145,6 @@ def display_static_dashboard(df):
                       title='Top 10 Positions by Employee Count', labels={'count': 'Employee Count'})
         fig5.update_layout(yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig5, use_container_width=True)
-
-    with col6:
-        valid_data = df.dropna(subset=['Tenure_Days', 'Score'])
-        fig6 = px.scatter(valid_data, x='Score', y='Tenure_Days',
-                          title='Tenure vs Work Ethic Score',
-                          trendline="ols",  
-                          trendline_scope="overall",
-                          trendline_color_override="red",
-                          labels={'Tenure_Days': 'Tenure (Days)'})
-        st.plotly_chart(fig6, use_container_width=True)
 
 
 def display_correlation_charts(df):
@@ -496,6 +486,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
