@@ -201,14 +201,13 @@ def display_geographic_analysis(df):
     """
     Performs city-based analysis and displays four interactive bar charts.
     """
-    st.subheader("Geographic Analysis (Top 10 Cities)")
+    st.subheader("Geographic Analysis (Top 8 Cities)")
 
     if 'City' not in df.columns:
         st.warning("Cannot generate geographic analysis because the 'City' column is missing from the historical dataset.")
         return
         
     if 'Tenure_Days' in df.columns and 'Early_Termination' not in df.columns:
-        df['Tenure_Days'] = df['Tenure_Days'].abs()
         df['Early_Termination'] = df['Tenure_Days'] <= 30
         
 
@@ -221,7 +220,7 @@ def display_geographic_analysis(df):
     ).round(2)
 
     city_analysis = city_analysis.sort_values('Employee_Count', ascending=False)
-    top_cities = city_analysis.head(10)
+    top_cities = city_analysis.head(8)
 
     col1, col2 = st.columns(2)
     col3, col4 = st.columns(2)
@@ -229,7 +228,7 @@ def display_geographic_analysis(df):
     # Employee Count by City
     with col1:
         fig1 = px.bar(top_cities, y=top_cities.index, x='Employee_Count', orientation='h',
-                      title='Top 10 Cities by Employee Count', color_discrete_sequence=px.colors.qualitative.Plotly)
+                      title='Top 8 Cities by Employee Count', color_discrete_sequence=px.colors.qualitative.Plotly)
         fig1.update_layout(yaxis_title='City', xaxis_title='Number of Employees', yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig1, use_container_width=True)
 
@@ -489,6 +488,7 @@ if static_df is not None:
 else:
 
     st.warning("Could not generate static analysis because the source data files are missing.")
+
 
 
 
